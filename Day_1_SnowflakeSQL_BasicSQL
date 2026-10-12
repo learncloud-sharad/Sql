@@ -149,3 +149,49 @@ ORDER BY order_id;
 9. Find orders whose tags JSON array contains the value "electronics".
 10. Return orders where the calculated net amount after discount exceeds 2000.
 Formula: Net amount = total_amount * (1 - COALESCE(discount_pct, 0) / 100)
+
+
+--1. Select the order_id, customer_name, and status of all orders that are marked as delivered.
+       select order_id, customer_name, status 
+        from orders where status = 'delivered' ;
+         
+-- 2. Find orders where total_amount is greater than 2000.
+    select * from orders where total_amount > 2000;
+--3. Return orders placed between 2025-02-01 and 2025-02-15, including both dates.
+     select * from orders 
+      where order_date between '2025-02-01' and '2025-02-15';
+
+
+-- 4. Show orders placed by customers from any of these cities: Mumbai, Pune, or Delhi.
+   select * from orders 
+   where city in ('Mumbai','Pune', 'Delhi');
+   
+--5. Find customers whose names start with the letter A.
+  select * from orders where customer_name like 'A%';
+  
+-- 6. List orders that do not have a delivery timestamp recorded yet.
+   select * from orders where delivered_at is null;
+   
+--7. Show delivered orders that were paid for using either upi or card.
+select * from orders where payment_method in ('upi','card');
+
+-- 8. Return orders that are neither cancelled nor returned, and where discount_pct is NULL.
+select * from orders 
+ where status not in ('cancelled','returned') 
+ and discount_pct is null;
+ 
+-- 9. Find orders whose tags JSON array contains the value "electronics".
+   select order_id, customer_name, tags
+from orders where  array_contains(to_variant('electronics'), tags);
+
+-- 10. Return orders where the calculated net amount after discount exceeds 2000.
+-- Formula: Net amount = total_amount * (1 - COALESCE(discount_pct, 0) / 100)
+
+   select
+    order_id,
+    customer_name,
+    total_amount,
+    discount_pct,
+    total_amount * (1 - COALESCE(discount_pct, 0) / 100) AS net_amount
+from  orders
+where total_amount * (1 - COALESCE(discount_pct, 0) / 100) > 2000;
