@@ -129,3 +129,23 @@ SELECT
     ) AS net_amount
 FROM orders
 ORDER BY order_id;
+
+=====================================================
+
+## SQL Practice Questions — Beginner to Advanced
+# Beginner
+1. Select the order_id, customer_name, and status of all orders that are marked as delivered.
+2. Find orders where total_amount is greater than 2000.
+3. Return orders placed between 2025-02-01 and 2025-02-15, including both dates.
+
+# Intermediate
+4. Show orders placed by customers from any of these cities: Mumbai, Pune, or Delhi.
+5. Find customers whose names start with the letter A.
+6. List orders that do not have a delivery timestamp recorded yet.
+7. Show delivered orders that were paid for using either upi or card.
+
+# Advanced
+8. Return orders that are neither cancelled nor returned, and where discount_pct is NULL.
+9. Find orders whose tags JSON array contains the value "electronics".
+10. Return orders where the calculated net amount after discount exceeds 2000.
+Formula: Net amount = total_amount * (1 - COALESCE(discount_pct, 0) / 100)
