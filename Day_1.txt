@@ -1,0 +1,131 @@
+
+-- =====================================================
+-- 1. CREATE DATABASE AND SELECT DATABASE
+-- =====================================================
+
+CREATE DATABASE IF NOT EXISTS training_db;
+
+USE DATABASE training_db;
+
+-- Create a schema for practice
+CREATE SCHEMA IF NOT EXISTS practice;
+
+USE SCHEMA practice;
+
+
+-- =====================================================
+-- 2. CLEAN SLATE
+-- =====================================================
+
+DROP TABLE IF EXISTS orders;
+
+
+-- =====================================================
+-- 3. CREATE ORDERS TABLE
+-- =====================================================
+
+CREATE TABLE orders (
+    order_id        NUMBER(10,0) PRIMARY KEY,
+    customer_id     NUMBER(10,0) NOT NULL,
+    customer_name   VARCHAR(100) NOT NULL,
+    email           VARCHAR(120) NOT NULL,
+    city            VARCHAR(60) NOT NULL,
+    country         VARCHAR(50) NOT NULL DEFAULT 'India',
+    order_date      DATE NOT NULL,
+    delivered_at    TIMESTAMP_NTZ,
+    status          VARCHAR(20) NOT NULL
+                    CHECK (status IN (
+                        'placed', 'processing', 'shipped',
+                        'delivered', 'cancelled', 'returned'
+                    )),
+    payment_method  VARCHAR(20) NOT NULL
+                    CHECK (payment_method IN (
+                        'card', 'upi', 'netbanking',
+                        'cod', 'wallet'
+                    )),
+    total_amount    NUMBER(10,2) NOT NULL,
+    discount_pct    NUMBER(5,2),
+    is_priority     BOOLEAN NOT NULL DEFAULT FALSE,
+    tags            VARIANT,
+    UNIQUE (email, order_date)
+);
+
+
+-- =====================================================
+-- 4. INSERT 20 SAMPLE ORDERS
+-- =====================================================
+
+INSERT INTO orders (
+    order_id, customer_id, customer_name, email,
+    city, country, order_date, delivered_at,
+    status, payment_method, total_amount,
+    discount_pct, is_priority, tags
+)
+SELECT
+    column1::NUMBER(10,0),
+    column2::NUMBER(10,0),
+    column3::VARCHAR(100),
+    column4::VARCHAR(120),
+    column5::VARCHAR(60),
+    column6::VARCHAR(50),
+    TO_DATE(column7),
+    TO_TIMESTAMP_NTZ(column8),
+    column9::VARCHAR(20),
+    column10::VARCHAR(20),
+    column11::NUMBER(10,2),
+    column12::NUMBER(5,2),
+    column13::BOOLEAN,
+    PARSE_JSON(column14)
+FROM VALUES
+
+(1001, 501, 'Aarav Mehta', 'aarav.mehta@example.com', 'Mumbai', 'India', '2025-01-10', '2025-01-12 14:30:00', 'delivered', 'upi', 1499.00, 10.00, FALSE, '["electronics","sale"]'),
+(1002, 502, 'Priya Sharma', 'priya.sharma@example.com', 'Pune', 'India', '2025-01-12', NULL, 'processing', 'card', 2599.50, NULL, TRUE, '["fashion"]'),
+(1003, 503, 'Rohan Gupta', 'rohan.gupta@example.com', 'Delhi', 'India', '2025-01-15', '2025-01-16 18:05:00', 'delivered', 'netbanking', 799.00, 0.00, FALSE, '["groceries","weekly"]'),
+(1004, 504, 'Neha Verma', 'neha.verma@example.com', 'Bengaluru', 'India', '2025-01-18', NULL, 'shipped', 'cod', 9999.99, 5.00, TRUE, '["electronics","premium"]'),
+(1005, 505, 'Kabir Singh', 'kabir.singh@example.com', 'Hyderabad', 'India', '2025-01-20', NULL, 'placed', 'wallet', 349.00, NULL, FALSE, '["books"]'),
+(1006, 506, 'Isha Nair', 'isha.nair@example.com', 'Chennai', 'India', '2025-01-22', '2025-01-25 09:10:00', 'delivered', 'upi', 459.75, 15.00, FALSE, '["beauty","clearance"]'),
+(1007, 507, 'Aman Jain', 'aman.jain@example.com', 'Jaipur', 'India', '2025-01-25', NULL, 'cancelled', 'card', 1299.00, 0.00, FALSE, '["fashion","returns"]'),
+(1008, 508, 'Diya Patel', 'diya.patel@example.com', 'Ahmedabad', 'India', '2025-01-28', NULL, 'processing', 'upi', 219.00, NULL, FALSE, '["stationery"]'),
+(1009, 509, 'Arjun Kulkarni', 'arjun.kulkarni@example.com', 'Nagpur', 'India', '2025-02-01', '2025-02-03 20:00:00', 'delivered', 'netbanking', 5499.00, 20.00, TRUE, '["appliances","festival"]'),
+(1010, 510, 'Sara Khan', 'sara.khan@example.com', 'Lucknow', 'India', '2025-02-03', NULL, 'shipped', 'cod', 899.00, 5.00, FALSE, '["toys"]'),
+(1011, 511, 'Vikram Rao', 'vikram.rao@example.com', 'Kochi', 'India', '2025-02-05', NULL, 'returned', 'wallet', 1899.00, NULL, FALSE, '["fashion","exchange"]'),
+(1012, 512, 'Ananya Das', 'ananya.das@example.com', 'Kolkata', 'India', '2025-02-07', '2025-02-08 11:45:00', 'delivered', 'card', 299.00, 0.00, FALSE, '["grocery"]'),
+(1013, 513, 'Harsh Vardhan', 'harsh.vardhan@example.com', 'Indore', 'India', '2025-02-10', NULL, 'placed', 'upi', 10499.00, 10.00, TRUE, '["electronics","gaming"]'),
+(1014, 514, 'Meera Iyer', 'meera.iyer@example.com', 'Coimbatore', 'India', '2025-02-11', '2025-02-12 16:00:00', 'delivered', 'netbanking', 649.00, NULL, FALSE, '["kitchen"]'),
+(1015, 515, 'Ritik Chopra', 'ritik.chopra@example.com', 'Bhopal', 'India', '2025-02-12', NULL, 'shipped', 'card', 749.00, 2.50, FALSE, '["sports"]'),
+(1016, 516, 'Sneha Reddy', 'sneha.reddy@example.com', 'Visakhapatnam', 'India', '2025-02-14', NULL, 'processing', 'wallet', 159.00, NULL, FALSE, '["stationery","office"]'),
+(1017, 517, 'Yash Thakur', 'yash.thakur@example.com', 'Surat', 'India', '2025-02-15', '2025-02-17 10:20:00', 'delivered', 'upi', 2050.00, 25.00, TRUE, '["fashion","clearance"]'),
+(1018, 518, 'Pooja Joshi', 'pooja.joshi@example.com', 'Noida', 'India', '2025-02-16', NULL, 'cancelled', 'cod', 499.00, NULL, FALSE, '["home-decor"]'),
+(1019, 519, 'Rahul Malhotra', 'rahul.malhotra@example.com', 'Gurugram', 'India', '2025-02-18', '2025-02-19 19:30:00', 'delivered', 'card', 3200.00, 12.50, FALSE, '["books","gift"]'),
+(1020, 520, 'Zara Ahmed', 'zara.ahmed@example.com', 'Thane', 'India', '2025-02-20', NULL, 'placed', 'netbanking', 89.00, 0.00, FALSE, '["add-on","small"]');
+
+
+-- =====================================================
+-- 5. VERIFY THE DATA
+-- =====================================================
+
+-- Check total rows
+SELECT COUNT(*) AS rows_inserted
+FROM orders;
+
+-- View all records
+SELECT *
+FROM orders
+ORDER BY order_id;
+
+-- Check available order statuses
+SELECT DISTINCT status
+FROM orders
+ORDER BY status;
+
+-- Calculate net amount after discount
+SELECT
+    order_id,
+    customer_name,
+    total_amount,
+    discount_pct,
+    total_amount * (
+        1 - COALESCE(discount_pct, 0) / 100
+    ) AS net_amount
+FROM orders
+ORDER BY order_id;
